@@ -21,26 +21,26 @@ import (
 )
 
 type Graph[Key comparable] struct {
-	nodes map[Key]nodeimpl[Key]
+	Nodes map[Key]Node[Key]
 }
 
 func NewGraph[Key comparable]() *Graph[Key] {
 	return &Graph[Key]{
-		nodes: make(map[Key]nodeimpl[Key]),
+		Nodes: make(map[Key]Node[Key]),
 	}
 }
 
 func (g *Graph[Key]) AddNode(key Key) {
 	if !g.ContainsNode(key) {
-		g.nodes[key] = make(nodeimpl[Key])
+		g.Nodes[key] = make(Node[Key])
 	}
 }
 
-func (g *Graph[Key]) getOrAddNode(node Key) nodeimpl[Key] {
-	n, ok := g.nodes[node]
+func (g *Graph[Key]) getOrAddNode(node Key) Node[Key] {
+	n, ok := g.Nodes[node]
 	if !ok {
-		n = make(nodeimpl[Key])
-		g.nodes[node] = n
+		n = make(Node[Key])
+		g.Nodes[node] = n
 	}
 	return n
 }
@@ -53,7 +53,7 @@ func (g *Graph[Key]) AddEdge(from Key, to Key) error {
 }
 
 func (g *Graph[Key]) ContainsNode(key Key) bool {
-	_, ok := g.nodes[key]
+	_, ok := g.Nodes[key]
 	return ok
 }
 
@@ -82,7 +82,7 @@ func (g *Graph[Key]) visit(key Key, results *orderedset[Key], visited *orderedse
 		return fmt.Errorf("Cycle error: %s", strings.Join(strs, " -> "))
 	}
 
-	n := g.nodes[key]
+	n := g.Nodes[key]
 	for _, edge := range n.edges() {
 		err := g.visit(edge, results, visited.copy())
 		if err != nil {
@@ -94,13 +94,13 @@ func (g *Graph[Key]) visit(key Key, results *orderedset[Key], visited *orderedse
 	return nil
 }
 
-type nodeimpl[Key comparable] map[Key]bool
+type Node[Key comparable] map[Key]bool
 
-func (n nodeimpl[Key]) addEdge(key Key) {
+func (n Node[Key]) addEdge(key Key) {
 	n[key] = true
 }
 
-func (n nodeimpl[Key]) edges() []Key {
+func (n Node[Key]) edges() []Key {
 	var keys []Key
 	for k := range n {
 		keys = append(keys, k)
