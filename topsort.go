@@ -52,6 +52,16 @@ func (g *Graph[Key]) AddEdge(from Key, to Key) error {
 	return nil
 }
 
+func (g *Graph[Key]) AddEdges(from Key, keys []Key) error {
+	for _, to := range keys {
+		err := g.AddEdge(from, to)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (g *Graph[Key]) ContainsNode(key Key) bool {
 	_, ok := g.Nodes[key]
 	return ok
