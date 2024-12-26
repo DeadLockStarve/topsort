@@ -5,7 +5,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,38 @@ func NewGraph[Key comparable]() *Graph[Key] {
 	return &Graph[Key]{
 		Nodes: make(map[Key]Node[Key]),
 	}
+}
+
+func addNodesToTempGraph[Key comparable](graph *Graph[Key], visited map[Key]bool, tempGraph *Graph[Key], node Key) {
+	if visited[node] {
+		return
+	}
+	visited[node] = true
+	tempGraph.AddNode(node)
+	for _, edge := range graph.Nodes[node].edges() {
+		if !visited[edge] {
+			tempGraph.AddEdge(node, edge)
+			addNodesToTempGraph(graph, visited, tempGraph, edge)
+		}
+	}
+}
+
+func (g *Graph[Key]) SubgraphFromTarget(target Key) *Graph[Key] {
+	tempGraph := NewGraph[Key]()
+	visited := make(map[Key]bool)
+
+	addNodesToTempGraph(g, visited, tempGraph, target)
+	return tempGraph
+}
+
+func (g *Graph[Key]) SubgraphFromTargets(targets []Key) *Graph[Key] {
+	tempGraph := NewGraph[Key]()
+	visited := make(map[Key]bool)
+
+	for _, target := range targets {
+		addNodesToTempGraph(g, visited, tempGraph, target)
+	}
+	return tempGraph
 }
 
 func (g *Graph[Key]) AddNode(key Key) {
