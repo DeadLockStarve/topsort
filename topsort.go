@@ -108,6 +108,18 @@ func (g *Graph[Key]) TopSort(key Key) ([]Key, error) {
 	return results.items, nil
 }
 
+func (g *Graph[Key]) TopSortMultiple(keys []Key) ([]Key, error) {
+	results := newOrderedSet[Key]()
+	visited := newOrderedSet[Key]()
+	for _, key := range keys {
+		err := g.visit(key, results, visited)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return results.items, nil
+}
+
 func (g *Graph[Key]) visit(key Key, results *orderedset[Key], visited *orderedset[Key]) error {
 	if visited == nil {
 		visited = newOrderedSet[Key]()
